@@ -99,9 +99,11 @@ body {
   margin-left: 20px;
 }
 .img {
-  /* position: absolute; */
+  position:unset ;
   width: 5%;
   height: 5%;
+  display: inline-table;
+
 }
 
 /* .elevator-shaft {
