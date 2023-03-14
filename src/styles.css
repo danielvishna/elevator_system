@@ -13,6 +13,7 @@ body {
 h1 {
   margin-top: 0;
   font-size: 22px;
+  text-align: center;
 }
 
 h2 {
@@ -48,9 +49,7 @@ ul {
   padding-left: 20px;
 }
 
-* {
-  box-sizing: border-box;
-}
+
 
 body {
   font-family: sans-serif;
@@ -60,7 +59,7 @@ body {
 
 .square {
   background: #fff;
-  border: 1px solid #999;
+  border: 0.5px solid hsla(0, 2%, 77%, 0.534);
   float: left;
   font-size: 24px;
   font-weight: bold;
@@ -70,17 +69,21 @@ body {
   margin-top: -1px;
   padding: 0;
   text-align: center;
-  width: 34px;
+  width: 80px;
+  
 }
 
 .winning-sq {
   background-color: limegreen;
 }
 
-.board-row:after {
+.board-row {
   clear: both;
   content: '';
-  display: table;
+  display: table-row;
+  margin-right: -1px;
+  margin-top: -1px;
+  margin-bottom: -2px;
 }
 
 .status {
@@ -95,20 +98,56 @@ body {
   margin-left: 20px;
 }
 .img {
-  width: 500px;
-  height: 600px;
-}
-.building {
-  display: flex;
+  position: absolute;
+  width: 5%;
+  height: 5%;
 }
 
-.elevator-shaft {
+/* .elevator-shaft {
   display: flex;
-  flex-direction: column;
   align-items: center;
 }
 
 .floor-container {
   display: flex;
   flex-direction: column-reverse; /* reverse the order of the buttons */
+/* } */
+.building{
+  flex-direction: column;
+  margin: auto;
+  display: table;
+  /* justify-content: center; */
+  /* align-items: center; */
+  /* table-layout: auto; */
+  width: 50%;
+
 }
+.call{
+  display: table-cell;
+  background-color: rgb(91,205,136);
+  border: none;
+  color: white;
+  border-radius: 4px;
+  
+  margin: 1%;
+  /* float: inline-end; */
+  text-align: center;
+
+}
+.floor-num{
+  display: table-row-group;
+  /* background: #fff; */
+  border: none;
+  float: left;
+  font-size: 12px;
+  font-weight: bold;
+  /* line-height: 34px; */
+  height: 20px; 
+  margin-right: 5px;
+  /* padding: 0; */
+  text-align: right;
+  width:25%;
+  /* border: 2px solid hsl(0, 0%, 0%); */
+  line-height: 34px;
+}
+

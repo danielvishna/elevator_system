@@ -1,5 +1,8 @@
-import { useState } from 'react';
-import Elevator from './Elevator';
+import React, { Component } from 'react';
+// import Elevator from './Elevator';
+import {motion} from "framer-motion";
+import elevatorSvg from './elevator.svg';
+
 
 class Building extends Component {
   state = {
@@ -16,6 +19,7 @@ class Building extends Component {
       { id: 1, calling: false }, // ground floor
     ],
   };
+  
 
   callElevator = (floorId) => {
     // Logic to call an elevator to a specific floor goes here
@@ -24,28 +28,43 @@ class Building extends Component {
 
   render() {
     // const { floors } = this.state;
-    const boardRows = [];
-    for(let i= 0; i < 10; i++){
-      const boardColumns = [];
-      if(i===0){
-        boardColumns.push(<h4>Ground Floor</h4>);
-      }
-      else if(i===1){
-        boardColumns.push(<h4>{i}st</h4>);
-      }
-      else if(i===2){
-        boardColumns.push(<h4>{i}nd</h4>);
-      }
-      else if(i===3){
-        boardColumns.push(<h4>{i}rd</h4>);
-      }
-      else{
-        boardColumns.push(<h4>{i}th</h4>);
-      }
-      boardRows.push(<div key={i} className="board-row">{boardColumns}</div>);
+  const boardRows = [];
+
+  for (let i = 9; i >= 0; i--) {
+    const boardColumns = [];
+    if(i===0){
+      boardColumns.push(<h4 className="floor-num">Ground Floor</h4>);
     }
+    else if(i===1){
+      boardColumns.push(<div className="floor-num">{i}st</div>);
+    }
+    else if(i===2){
+      boardColumns.push(<div className="floor-num">{i}nd</div>);
+    }
+    else if(i===3){
+      boardColumns.push(<div className="floor-num">{i}rd</div>);
+    }
+    else{
+      boardColumns.push(<div className="floor-num">{i}th</div>);
+    }
+    for (let j = 0; j < 5; j++) {
+      if(i === 0){
+        boardColumns.push(<motion.div>
+         <img className='img' src={elevatorSvg} alt="Elevator" />
+        </motion.div>);
+      }
+      boardColumns.push(
+          <div className="square">{}</div>
+        );
+      
+
+    }
+    boardColumns.push(<button className='call'>Call</button>);
+    boardRows.push(<div className="board-row">{boardColumns}</div>);
+  }
     return (
       <>
+      <h1>Elevator Exercise</h1>
       <div className="building">
         {boardRows}
       </div>
