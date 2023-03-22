@@ -2,15 +2,16 @@ import React, { Component, useState } from 'react';
 // import Elevator from './Elevator';
 import {delay, motion} from "framer-motion";
 import elevatorSvg from './elevator.svg';
+
 function Elevator(props) {
-  return (
+  return(
     <motion.div
-      animate={{ y: [0 ,props.currentFloor * -33, 0], x: -40}}
-      transition={{ duration: props.currentFloor, type: "tween"}}
+      animate={{ y: [0 ,props.currentFloor * -33]}}
+      transition={{ duration: props.currentFloor , type: "tween"}}
     >
-      <img className='img' src={elevatorSvg} alt="Elevator" />
-    </motion.div>
-  );
+      <img src={elevatorSvg} alt="Elevator" id='passenger_elevator_image'/>
+    </motion.div>)
+  ;
 }
 
 function Board(){
@@ -22,38 +23,43 @@ function Board(){
   for (let i = 9; i >= 0; i--) {
     const boardColumns = [];
     if(i===0){
-      boardColumns.push(<div key={i} className="floor-num">Ground Floor</div>);
+      boardColumns.push(<td key={i} className="floor-num">Ground Floor</td>);
     }
     else if(i===1){
-      boardColumns.push(<div key={i} className="floor-num">{i}st</div>);
+      boardColumns.push(<td key={i} className="floor-num">{i}st</td>);
     }
     else if(i===2){
-      boardColumns.push(<div key={i} className="floor-num">{i}nd</div>);
+      boardColumns.push(<td key={i} className="floor-num">{i}nd</td>);
     }
     else if(i===3){
-      boardColumns.push(<div key={i} className="floor-num">{i}rd</div>);
+      boardColumns.push(<td key={i} className="floor-num">{i}rd</td>);
     }
     else{
-      boardColumns.push(<div key={i} className="floor-num">{i}th</div>);
+      boardColumns.push(<td key={i} className="floor-num">{i}th</td>);
     }
     for (let j = 0; j < 3; j++) {
-      boardColumns.push(
-          <div key={i*5 + j + 100} className="square">{}</div>
-        );
-        if(i === 0 && (j === 2|| j === 0)){
-          boardColumns.push(<Elevator key={j + 78} currentFloor={currentFloor}/>);
+     
+        if(i === 0){
+          boardColumns.push(
+              <td key={i * 5 + j + 2000} className="square" id='Elevator_Shaft_Cell'>{<><div key={i * 5 + j + 100} className="square"><Elevator key={j + 78} currentFloor={currentFloor} /></div> </>}</td>
+            );
+        }
+        else{
+          boardColumns.push(<td key={i * 5 + j + 2000} className="square" id='Elevator_Shaft_Cell'><div key={i*5 + j + 100} className="square">{}</div></td>
+          );  
         }
       
 
     }
-    boardColumns.push(<button key={i + 200} className='call'  onClick={() => {
+    boardColumns.push(<td key={i + 390}><button key={i + 200} className='call'  onClick={() => {
       setCurrentFloor(i);
       
     }
-    }>Call</button>);
-    boardRows.push(<div key={i + 300} className="board-row">{boardColumns}</div>);
+    }>Call</button></td>);
+    // boardRows.push(<div key={i + 300} className="board-row">{boardColumns}</div>);
+    boardRows.push(<tr className="board-row">{boardColumns}</tr>);
   }
-  return boardRows
+  return <table>{boardRows}</table> 
 }
 
 
