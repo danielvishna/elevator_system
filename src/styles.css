@@ -81,7 +81,7 @@ body {
 .board-row {
   clear: both;
   content: '';
-  display: table-row;
+  /* display: table-row; */
   margin-right: -1px;
   margin-top: -1px;
   margin-bottom: -2px;
