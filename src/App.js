@@ -3,35 +3,119 @@ import React, { Component, useState } from 'react';
 import {delay, motion} from "framer-motion";
 import  elevatorSvg from './elevator.svg';
 
+const FLOOR_TRAVEL_TIME = 2;
+
 function Elevator(props) {
-  if(props.destinationFloor === null){
+  if(props.elevator.destinationFloor === null || props.elevator.destinationFloor === 0){
     return (<img src={elevatorSvg} alt="Elevator" id='passenger_elevator_image'/>);
   }
-  return(
-    <motion.div
-      animate={{ y: [0 ,props.destinationFloor * -34, 0]}}
-      transition={{ duration: props.destinationFloor , type: "tween"}}
-    >
-      <img className='red' src={elevatorSvg} alt="Elevator" id='passenger_elevator_image'/>
-    </motion.div>)
-  ;
+  if(props.elevator.direction == 1){
+    return(
+      <motion.div
+        animate={{ y: [0 ,props.elevator.destinationFloor * -34]}}
+        transition={{ duration: props.elevator.destinationFloor, type: "tween"}}
+      >
+        <img className='red' src={elevatorSvg} alt="Elevator" id='passenger_elevator_image'/>
+      </motion.div>);
+  }
+  if(props.elevator.direction == -1){
+    return(
+      <motion.div
+        animate={{ y: [props.elevator.destinationFloor * -34, 0]}}
+        transition={{ duration: props.elevator.destinationFloor , type: "tween"}}
+      >
+        <img src={elevatorSvg} className='green' alt="Elevator" id='passenger_elevator_image'/>
+      </motion.div>);
+  }
+    
+
 }
 
 function CallButten(props){
   return (<button key={props.keys} className='call'  onClick={props.onCallButtenClick}>Call</button>)
 }
-let elevators = []
 
-function Board(){
+const playSound = () => {
+  const sound = new Audio("https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3");
+  sound.play();
+};
+
+function Board(props){
+  const [floorButtons, setFloorButtons] = useState({
+    floor0:{
+    isCallActive: false,
+    isWaitingActive: false,
+    isArrivedActive: false,
+    floorNumber: 0
+    },
+    floor1:{
+      isCallActive: false,
+      isWaitingActive: false,
+      isArrivedActive: false,
+      floorNumber: 1
+    },
+    floor2:{
+      isCallActive: false,
+      isWaitingActive: false,
+      isArrivedActive: false,
+      floorNumber: 2
+    },
+    floor3:{
+      isCallActive: false,
+      isWaitingActive: false,
+      isArrivedActive: false,
+      floorNumber: 3
+    },
+    floor4:{
+      isCallActive: false,
+      isWaitingActive: false,
+      isArrivedActive: false,
+      floorNumber: 4
+    },
+    floor5:{
+      isCallActive: false,
+      isWaitingActive: false,
+      isArrivedActive: false,
+      floorNumber: 5
+    },
+    floor6:{
+      isCallActive: false,
+      isWaitingActive: false,
+      isArrivedActive: false,
+      floorNumber: 6
+    },
+    floor7:{
+      isCallActive: false,
+      isWaitingActive: false,
+      isArrivedActive: false,
+      floorNumber: 7
+    },
+    floor8:{
+      isCallActive: false,
+      isWaitingActive: false,
+      isArrivedActive: false,
+      floorNumber: 8
+    },
+    floor9:{
+      isCallActive: false,
+      isWaitingActive: false,
+      isArrivedActive: false,
+      floorNumber: 9
+     },});
   const boardRows = [];
-  const [currentFloor, setCurrentFloor] = useState(0);
+  // const [currentFloor, setCurrentFloor] = useState(0);
+  // const [count, setCount] = useState(0);
+  const [callQueue, setCallQueue] = useState([]);
   const [elevatorStatus, setElevatorStatus] = useState({
     elevator1: {
       currentFloor: 0,
       destinationFloor: null,
+      isArrived: false,
       isMoving: false,
       isOccupied: false,
       timeTaken: null,
+      direction: 1,
+      counter:0 
     },
     elevator2: {
       currentFloor: 0,
@@ -39,6 +123,8 @@ function Board(){
       isMoving: false,
       isOccupied: false,
       timeTaken: null,
+      direction: 1,
+      counter:0 
     },
     elevator3: {
       currentFloor: 0,
@@ -46,6 +132,8 @@ function Board(){
       isMoving: false,
       isOccupied: false,
       timeTaken: null,
+      direction: 1,
+      counter:0 
     },
     elevator4: {
       currentFloor: 0,
@@ -53,6 +141,8 @@ function Board(){
       isMoving: false,
       isOccupied: false,
       timeTaken: null,
+      direction: 1,
+      counter:0 
     },
     elevator5: {
       currentFloor: 0,
@@ -60,20 +150,37 @@ function Board(){
       isMoving: false,
       isOccupied: false,
       timeTaken: null,
+      direction: 1,
+      counter:0 
     },
   });
-  const [elevators, setElevators] = useState([]);
+  // const [elevators, setElevators] = useState([]);
   const handleCallElevator = (floorNumber) => {
     // find the closest available elevator to the floor
     const availableElevators = Object.keys(elevatorStatus).filter(
       (elevatorId) => !elevatorStatus[elevatorId].isOccupied
     );
+    const floorChose =  Object.keys(floorButtons).filter(
+      (floorId) => floorButtons[floorId].floorNumber === floorNumber
+    )[0];
+    console.log(availableElevators);
+    if(availableElevators.length === 0){
+      setFloorButtons({...floorButtons,
+        [floorChose]: {...floorButtons[floorChose], isCallActive: true}
+      });
+      return;
+    }
+    setFloorButtons({...floorButtons,
+      [floorChose]: {...floorButtons[floorChose], isMoving: true}
+    });
+    // console.log(availableElevators.length);
     const elevatorDistances = availableElevators.map((elevatorId) =>
       Math.abs(elevatorStatus[elevatorId].currentFloor - floorNumber)
     );
     const closestElevatorIndex = elevatorDistances.indexOf(Math.min(...elevatorDistances));
     const closestElevator = availableElevators[closestElevatorIndex];
-
+    console.log(closestElevator);
+    // console.log(null);
     // send the elevator to the floor
     setElevatorStatus({
       ...elevatorStatus,
@@ -81,34 +188,75 @@ function Board(){
         ...elevatorStatus[closestElevator],
         destinationFloor: floorNumber,
         isMoving: true,
-        isOccupied: true,
+        isOccupied: true
       },
-    });};
+    });
+    setTimeout(() => {
+      setElevatorStatus({
+        ...elevatorStatus,
+        [closestElevator]: {
+          ...elevatorStatus[closestElevator],
+          destinationFloor: floorNumber,
+          
+          isMoving: true,
+          isOccupied: true,
+          timeTaken : Math.abs(elevatorStatus[closestElevator].currentFloor - floorNumber) * FLOOR_TRAVEL_TIME,
+          direction:-1
+        },
+      });
+      // elevator.isMoving = false;
+      // elevator.isArrived = true;
+      // elevator.timeTaken = Math.abs(elevator.currentFloor - floor) * FLOOR_TRAVEL_TIME;
+      // elevator.currentFloor = floor;
   
-  // const [doMove, setDoMove] = useState(false);
+      // floorButtons[floor].isWaitingActive = false;
+      // floorButtons[floor].isArrivedActive = true;
+      // setFloorButtons([...floorButtons]);
+  
+      playSound();
+  
+      setTimeout(() => {
+        setElevatorStatus({
+          ...elevatorStatus,
+          [closestElevator]: {
+            ...elevatorStatus[closestElevator],
+            destinationFloor: 0,
+            currentFloor : floorNumber,
+            isMoving: false,
+            isOccupied: false,
+            timeTaken : Math.abs(elevatorStatus[closestElevator].currentFloor - floorNumber) * FLOOR_TRAVEL_TIME,
+            direction:1
+          },
+        });
+      }, 2000);
+    }, Math.abs(elevatorStatus[closestElevator].currentFloor - floorNumber) * FLOOR_TRAVEL_TIME * 1000);
 
-  //Todo: change all the keys
+    
+   
+
+
+  };
   for (let i = 9; i >= 0; i--) {
     const boardColumns = [];
     if(i===0){
-      boardColumns.push(<td key={"floor-num"+i} className="floor-num">Ground Floor</td>);
+      boardColumns.push(<td key={`floor-num-${i}`} className="floor-num">Ground Floor</td>);
     }
     else if(i===1){
-      boardColumns.push(<td key={"floor-num"+i} className="floor-num">{i}st</td>);
+      boardColumns.push(<td key={`floor-num-${i}`} className="floor-num">{i}st</td>);
     }
     else if(i===2){
-      boardColumns.push(<td key={"floor-num"+i} className="floor-num">{i}nd</td>);
+      boardColumns.push(<td key={`floor-num-${i}`} className="floor-num">{i}nd</td>);
     }
     else if(i===3){
-      boardColumns.push(<td key={"floor-num"+i} className="floor-num">{i}rd</td>);
+      boardColumns.push(<td key={`floor-num-${i}`} className="floor-num">{i}rd</td>);
     }
     else{
-      boardColumns.push(<td key={"floor-num"+i} className="floor-num">{i}th</td>);
+      boardColumns.push(<td key={`floor-num-${i}`} className="floor-num">{i}th</td>);
     }
     if(i === 0){
-      boardColumns.push( Object.keys(elevatorStatus).map(elevatorId=> (<td key={"td" + elevatorId} className="square" id='Elevator_Shaft_Cell'>
-      {<><div key={"square" + elevatorId} className="square">
-        <Elevator key={"elevator"+elevatorId} currentFloor={elevatorStatus[elevatorId].currentFloor} destinationFloor={elevatorStatus[elevatorId].destinationFloor} />
+      boardColumns.push( Object.keys(elevatorStatus).map(elevatorId=> (<td key={`tdEl-${elevatorId}`} className="square" id='Elevator_Shaft_Cell'>
+      {<><div key={`square-${elevatorId}`} className="square">
+        <Elevator key={`elevator-${elevatorId}`} elevator={elevatorStatus[elevatorId]} />
         </div> </>}
       </td>))
         
@@ -116,23 +264,13 @@ function Board(){
     }
     else{
       for (let j = 0; j < 5; j++) {
-     
-        if(i === 0){
-          const el = "elevator" + (j + 1)
-          
-        }
-        else{
-          boardColumns.push(<td key={"td" + i * 5 + j} className="square" id='Elevator_Shaft_Cell'><div  key={"square" +(i * 5 + j)} className="square">{}</div></td>
-          );  
-        }
-      
-
-    }
+        boardColumns.push(<td key={`tdSq-${ i * 5 + j}`} className="square" id='Elevator_Shaft_Cell'><div  key={`square-${ i * 5 + j}`} className="square">{}</div></td>);  
+      }
     } 
     
-    boardColumns.push(<td key={i + 390}><CallButten keys={"CallButten"+i} onCallButtenClick={ () => handleCallElevator(i)}/></td>);
+    boardColumns.push(<td key={`td-${i}`}><CallButten keys={`CallButten-${i}`} onCallButtenClick={ () => handleCallElevator(i, props.elevators)}/></td>);
     // boardRows.push(<div key={i + 300} className="board-row">{boardColumns}</div>);
-    boardRows.push(<tr key={-i} className="board-row">{boardColumns}</tr>);
+    boardRows.push(<tr key={`td-${i}`} className="board-row">{boardColumns}</tr>);
   }
   return <table><tbody>{boardRows}</tbody></table> 
 }
@@ -144,6 +282,9 @@ export default function Building(){
   const [elevatorMoving, setElevatorMoving] = useState([Array(5).fill(false)]);
   const [elevatorFloor, setElevatorFloor] = useState([Array(5).fill(0)]);
   const [buttonCall, setButtonCall] = useState([Array(10).fill(false)]);
+  
+  
+  
   
   return (
     <>
