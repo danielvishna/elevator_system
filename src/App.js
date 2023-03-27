@@ -3,10 +3,10 @@ import React, { Component, useState } from 'react';
 import {delay, motion} from "framer-motion";
 import  elevatorSvg from './elevator.svg';
 
-const FLOOR_TRAVEL_TIME = 2;
+const FLOOR_TRAVEL_TIME = 1;
 
 function Elevator(props) {
-  if(props.elevator.destinationFloor === null || props.elevator.destinationFloor === 0){
+  if(props.elevator.destinationFloor === null){
     return (<img src={elevatorSvg} alt="Elevator" id='passenger_elevator_image'/>);
   }
   if(props.elevator.direction == 1){
@@ -21,10 +21,10 @@ function Elevator(props) {
   if(props.elevator.direction == -1){
     return(
       <motion.div
-        animate={{ y: [props.elevator.destinationFloor * -34, 0]}}
-        transition={{ duration: props.elevator.destinationFloor , type: "tween"}}
+        animate={{ y: [props.elevator.currentFloor * -34, 0]}}
+        transition={{ duration: props.elevator.currentFloor, type: "tween"}}
       >
-        <img src={elevatorSvg} className='green' alt="Elevator" id='passenger_elevator_image'/>
+        <img className='red' src={elevatorSvg} alt="Elevator" id='passenger_elevator_image'/>
       </motion.div>);
   }
     
@@ -103,8 +103,6 @@ function Board(props){
       floorNumber: 9
      },});
   const boardRows = [];
-  // const [currentFloor, setCurrentFloor] = useState(0);
-  // const [count, setCount] = useState(0);
   const [callQueue, setCallQueue] = useState([]);
   const [elevatorStatus, setElevatorStatus] = useState({
     elevator1: {
@@ -163,7 +161,6 @@ function Board(props){
     const floorChose =  Object.keys(floorButtons).filter(
       (floorId) => floorButtons[floorId].floorNumber === floorNumber
     )[0];
-    console.log(availableElevators);
     if(availableElevators.length === 0){
       setFloorButtons({...floorButtons,
         [floorChose]: {...floorButtons[floorChose], isCallActive: true}
@@ -173,14 +170,11 @@ function Board(props){
     setFloorButtons({...floorButtons,
       [floorChose]: {...floorButtons[floorChose], isMoving: true}
     });
-    // console.log(availableElevators.length);
     const elevatorDistances = availableElevators.map((elevatorId) =>
       Math.abs(elevatorStatus[elevatorId].currentFloor - floorNumber)
     );
     const closestElevatorIndex = elevatorDistances.indexOf(Math.min(...elevatorDistances));
     const closestElevator = availableElevators[closestElevatorIndex];
-    console.log(closestElevator);
-    // console.log(null);
     // send the elevator to the floor
     setElevatorStatus({
       ...elevatorStatus,
@@ -192,44 +186,50 @@ function Board(props){
       },
     });
     setTimeout(() => {
-      setElevatorStatus({
-        ...elevatorStatus,
-        [closestElevator]: {
-          ...elevatorStatus[closestElevator],
-          destinationFloor: floorNumber,
-          
-          isMoving: true,
-          isOccupied: true,
-          timeTaken : Math.abs(elevatorStatus[closestElevator].currentFloor - floorNumber) * FLOOR_TRAVEL_TIME,
-          direction:-1
-        },
-      });
-      // elevator.isMoving = false;
-      // elevator.isArrived = true;
-      // elevator.timeTaken = Math.abs(elevator.currentFloor - floor) * FLOOR_TRAVEL_TIME;
-      // elevator.currentFloor = floor;
-  
-      // floorButtons[floor].isWaitingActive = false;
-      // floorButtons[floor].isArrivedActive = true;
-      // setFloorButtons([...floorButtons]);
-  
       playSound();
-  
       setTimeout(() => {
         setElevatorStatus({
           ...elevatorStatus,
           [closestElevator]: {
             ...elevatorStatus[closestElevator],
             destinationFloor: 0,
-            currentFloor : floorNumber,
-            isMoving: false,
-            isOccupied: false,
+            currentFloor: floorNumber,
+            
+            isMoving: true,
+            isOccupied: true,
             timeTaken : Math.abs(elevatorStatus[closestElevator].currentFloor - floorNumber) * FLOOR_TRAVEL_TIME,
-            direction:1
+            direction:-1
           },
         });
+        setTimeout(() => {
+          setElevatorStatus({
+            ...elevatorStatus,
+            [closestElevator]: {
+              ...elevatorStatus[closestElevator],
+              destinationFloor: null,
+              currentFloor : 0,
+              isMoving: false,
+              isOccupied: false,
+              timeTaken : Math.abs(elevatorStatus[closestElevator].destinationFloor - floorNumber) * FLOOR_TRAVEL_TIME,
+              direction:1
+            },
+          });
+        }, Math.abs(elevatorStatus[closestElevator].destinationFloor - floorNumber) * FLOOR_TRAVEL_TIME * 1000);
+        // elevator.isArrived = false;
+        // floorButtons[floor].isArrivedActive = false;
+        // floorButtons[floor].isCallActive = false;
+        // setFloorButtons([...floorButtons]);
       }, 2000);
+      
+  
+      
+  
+     
+      // setTimeout(() => {
+      // }, 2000);
     }, Math.abs(elevatorStatus[closestElevator].currentFloor - floorNumber) * FLOOR_TRAVEL_TIME * 1000);
+    
+
 
     
    
