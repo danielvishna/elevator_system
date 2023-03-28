@@ -63,8 +63,8 @@ body {
   float: left;
   font-size: 24px;
   font-weight: bold;
-  line-height: 34px;
-  height: 34px;
+  line-height: 38px;
+  height: 38px;
   margin-right: -1px;
   margin-top: -1px;
   padding: 0;
@@ -79,25 +79,13 @@ body {
 }
 
 .board-row {
-  clear: both;
-  content: '';
   display: table-row;
-  margin-right: -1px;
-  margin-top: -1px;
-  margin-bottom: -2px;
 }
 
 .status {
   margin-bottom: 10px;
 }
-.game {
-  display: flex;
-  flex-direction: row;
-}
 
-.game-info {
-  margin-left: 20px;
-}
 img {
   overflow-clip-margin: content-box;
   overflow: clip;
@@ -111,62 +99,56 @@ img {
 }
 .green{
   filter: invert(21%) sepia(100%) saturate(1957%) hue-rotate(97deg) brightness(104%) contrast(104%);
-
-
-
-
-  /* filter: invert(9%) sepia(99%) saturate(5630%) hue-rotate(246deg) brightness(111%) contrast(148%) */
-  /* filter: grayscale(100%) brightness(80%) sepia(300%) hue-rotate(50deg) saturate(500%); */
-  /* background-color: green; */
-  /* fill: blue; */
-  
 }
-/* .elevator-shaft {
-  display: flex;
-  align-items: center;
-}
-
-.floor-container {
-  display: flex;
-  flex-direction: column-reverse; /* reverse the order of the buttons */
-/* } */
 .building{
   flex-direction: column;
   margin: auto;
   display: table;
-  /* justify-content: center; */
-  /* align-items: center; */
-  /* table-layout: auto; */
+  justify-content: center;
+  align-items: center;
+  table-layout: auto;
   width: 55%;
 
 }
-.call{
+table{
+  height: 400px;
+}
+button{
   display: table-cell;
-  background-color: rgb(91,205,136);
-  border: none;
-  color: white;
-  border-radius: 4px;
-  height: 20px; 
+  border-radius: 3px;
+  height: 25px; 
+  width: 60px;
   
-  margin: 1%;
+  margin: 10%;
   float: inline-end;
   text-align: center;
+}
+.call{
+  background-color: rgb(91,205,136);
+  color: white;
+  border: none;
 
+
+}
+.arrived{
+  border-color: rgb(91,205,136);
+  color: rgb(91,205,136);
+}
+.waiting{
+  background-color: red;
+  color: white;
+  border: none;
 }
 .floor-num{
   display: table-row-group;
-  /* background: #fff; */
   border: none;
   float: left;
   font-size: 12px;
   font-weight: bold;
-  /* line-height: 34px; */
   height: 20px; 
   margin-right: 5px;
-  /* padding: 0; */
   text-align: right;
   width:80px;
-  /* border: 2px solid hsl(0, 0%, 0%); */
-  line-height: 34px;
+  line-height: 38px;
 }
 

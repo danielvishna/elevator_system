@@ -1,26 +1,39 @@
 import React, { Component } from 'react';
 import elevatorSvg from './elevator.svg';
+import {motion} from "framer-motion";
+const FLOOR_TRAVEL_TIME = 1;
+const higthRow = -41;
 
-class Elevator extends Component {
-  state = {
-    currentFloor: 1, // start at the ground floor
-    direction: 'up', // start moving up
-  };
-
-  moveToFloor = (floor) => {
-    // Logic to move the elevator to a specific floor goes here
-  };
-
-  render() {
-    const { currentFloor } = this.state;
-
-    return (
-      <div className="elevator">
-        <img className='img' src={elevatorSvg} alt="Elevator" />
-        <div className="floor-indicator">{currentFloor}</div>
-      </div>
-    );
+function Elevator(props) {
+  
+  if(props.elevator.isMoving){
+    return(
+      <motion.div
+        animate={{ y: [props.elevator.currentFloor * higthRow ,props.elevator.destinationFloor * higthRow]}}
+        transition={{ duration: Math.abs(props.elevator.currentFloor - props.elevator.destinationFloor) * FLOOR_TRAVEL_TIME, type: "tween"}}
+      >
+        <img className='red' src={elevatorSvg} alt="Elevator" id='passenger_elevator_image'/>
+      </motion.div>);
   }
+  if(props.elevator.isArrived){
+    return(
+      <motion.div
+        animate={{ y: [props.elevator.currentFloor * higthRow]}} className="green"
+      >
+        <img src={elevatorSvg} alt="Elevator" id='passenger_elevator_image'
+         className='green' />
+      </motion.div>);
+  }
+  else{
+    return(
+      <motion.div
+        animate={{ y: [props.elevator.currentFloor * higthRow]}}
+      >
+        <img src={elevatorSvg} alt="Elevator" id='passenger_elevator_image'/>
+      </motion.div>);
+  }
+    
+
 }
 
 export default Elevator;
