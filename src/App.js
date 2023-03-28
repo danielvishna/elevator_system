@@ -4,27 +4,34 @@ import {delay, motion} from "framer-motion";
 import  elevatorSvg from './elevator.svg';
 
 const FLOOR_TRAVEL_TIME = 1;
+let nextId = 0;
 
 function Elevator(props) {
-  if(props.elevator.destinationFloor === null){
-    return (<img src={elevatorSvg} alt="Elevator" id='passenger_elevator_image'/>);
-  }
-  if(props.elevator.direction == 1){
+  
+  if(props.elevator.isMoving){
     return(
       <motion.div
-        animate={{ y: [0 ,props.elevator.destinationFloor * -34]}}
-        transition={{ duration: props.elevator.destinationFloor, type: "tween"}}
+        animate={{ y: [props.elevator.currentFloor * -34 ,props.elevator.destinationFloor * -34]}}
+        transition={{ duration: Math.abs(props.elevator.currentFloor - props.elevator.destinationFloor) * FLOOR_TRAVEL_TIME, type: "tween"}}
       >
         <img className='red' src={elevatorSvg} alt="Elevator" id='passenger_elevator_image'/>
       </motion.div>);
   }
-  if(props.elevator.direction == -1){
+  if(props.elevator.isArrived){
     return(
       <motion.div
-        animate={{ y: [props.elevator.currentFloor * -34, 0]}}
-        transition={{ duration: props.elevator.currentFloor, type: "tween"}}
+        animate={{ y: [props.elevator.currentFloor * -34]}}
       >
-        <img className='red' src={elevatorSvg} alt="Elevator" id='passenger_elevator_image'/>
+        <img src={elevatorSvg} alt="Elevator" id='passenger_elevator_image'
+        style={{filter: "invert(9%) sepia(99%) saturate(5630%) hue-rotate(246deg) brightness(111%) contrast(148%)"}} />
+      </motion.div>);
+  }
+  else{
+    return(
+      <motion.div
+        animate={{ y: [props.elevator.currentFloor * -34 ]}}
+      >
+        <img src={elevatorSvg} alt="Elevator" id='passenger_elevator_image'/>
       </motion.div>);
   }
     
@@ -32,6 +39,13 @@ function Elevator(props) {
 }
 
 function CallButten(props){
+  const floorChose =  Object.keys(props.floorButtons).filter(
+    (floorId) => props.floorButtons[floorId].floorNumber === props.floor
+  )[0];
+  if (props.floorButtons[floorChose].isArrivedActive)
+  {
+    return (<button key={props.keys} className='call'  onClick={props.onCallButtenClick}>Call</button>)
+  }
   return (<button key={props.keys} className='call'  onClick={props.onCallButtenClick}>Call</button>)
 }
 
@@ -107,52 +121,45 @@ function Board(props){
   const [elevatorStatus, setElevatorStatus] = useState({
     elevator1: {
       currentFloor: 0,
-      destinationFloor: null,
+      destinationFloor: 0,
       isArrived: false,
       isMoving: false,
       isOccupied: false,
-      timeTaken: null,
-      direction: 1,
-      counter:0 
+      timeTaken: null
     },
     elevator2: {
       currentFloor: 0,
-      destinationFloor: null,
+      destinationFloor: 0,
       isMoving: false,
       isOccupied: false,
+      isArrived: false,
       timeTaken: null,
-      direction: 1,
-      counter:0 
     },
     elevator3: {
       currentFloor: 0,
-      destinationFloor: null,
+      destinationFloor: 0,
       isMoving: false,
       isOccupied: false,
+      isArrived: false,
       timeTaken: null,
-      direction: 1,
-      counter:0 
     },
     elevator4: {
       currentFloor: 0,
-      destinationFloor: null,
+      destinationFloor: 0,
       isMoving: false,
       isOccupied: false,
+      isArrived: false,
       timeTaken: null,
-      direction: 1,
-      counter:0 
     },
     elevator5: {
       currentFloor: 0,
-      destinationFloor: null,
+      destinationFloor: 0,
       isMoving: false,
       isOccupied: false,
+      isArrived: false,
       timeTaken: null,
-      direction: 1,
-      counter:0 
     },
   });
-  // const [elevators, setElevators] = useState([]);
   const handleCallElevator = (floorNumber) => {
     // find the closest available elevator to the floor
     const availableElevators = Object.keys(elevatorStatus).filter(
@@ -165,6 +172,7 @@ function Board(props){
       setFloorButtons({...floorButtons,
         [floorChose]: {...floorButtons[floorChose], isCallActive: true}
       });
+
       return;
     }
     setFloorButtons({...floorButtons,
@@ -186,54 +194,52 @@ function Board(props){
       },
     });
     setTimeout(() => {
+      setElevatorStatus({
+        ...elevatorStatus,
+        [closestElevator]: {
+          ...elevatorStatus[closestElevator],
+          currentFloor: floorNumber,
+          isMoving: false,
+          isArrived: true,
+          timeTaken : Math.abs(elevatorStatus[closestElevator].currentFloor - floorNumber) * FLOOR_TRAVEL_TIME
+        },
+      });
+      setFloorButtons({...floorButtons,
+        [floorChose]:
+         {...floorButtons[floorChose], isMoving: false, isArrived:true}
+      });
       playSound();
+      
       setTimeout(() => {
         setElevatorStatus({
           ...elevatorStatus,
           [closestElevator]: {
             ...elevatorStatus[closestElevator],
-            destinationFloor: 0,
-            currentFloor: floorNumber,
-            
-            isMoving: true,
-            isOccupied: true,
-            timeTaken : Math.abs(elevatorStatus[closestElevator].currentFloor - floorNumber) * FLOOR_TRAVEL_TIME,
-            direction:-1
-          },
+          
+            isArrived: false,
+            isOccupied: false,
+            // destinationFloor: null
+          }
         });
+        console.log(elevatorStatus);
+        return;
         setTimeout(() => {
           setElevatorStatus({
             ...elevatorStatus,
             [closestElevator]: {
               ...elevatorStatus[closestElevator],
-              destinationFloor: null,
-              currentFloor : 0,
-              isMoving: false,
+            
+              isArrived: false,
               isOccupied: false,
-              timeTaken : Math.abs(elevatorStatus[closestElevator].destinationFloor - floorNumber) * FLOOR_TRAVEL_TIME,
-              direction:1
-            },
+              // destinationFloor: null
+            }
           });
-        }, Math.abs(elevatorStatus[closestElevator].destinationFloor - floorNumber) * FLOOR_TRAVEL_TIME * 1000);
-        // elevator.isArrived = false;
-        // floorButtons[floor].isArrivedActive = false;
-        // floorButtons[floor].isCallActive = false;
-        // setFloorButtons([...floorButtons]);
+          console.log(elevatorStatus);
+          return;
+        }, 2000);
       }, 2000);
-      
-  
-      
-  
-     
-      // setTimeout(() => {
-      // }, 2000);
     }, Math.abs(elevatorStatus[closestElevator].currentFloor - floorNumber) * FLOOR_TRAVEL_TIME * 1000);
-    
-
-
-    
-   
-
+    console.log(`the2 ${elevatorStatus[closestElevator].destinationFloor}`);
 
   };
   for (let i = 9; i >= 0; i--) {
@@ -268,7 +274,9 @@ function Board(props){
       }
     } 
     
-    boardColumns.push(<td key={`td-${i}`}><CallButten keys={`CallButten-${i}`} onCallButtenClick={ () => handleCallElevator(i, props.elevators)}/></td>);
+    boardColumns.push(<td key={`td-${i}`}>
+      <CallButten keys={`CallButten-${i}`} floorButtons={floorButtons} floor={i}  onCallButtenClick={ () => handleCallElevator(i, props.elevators)}/>
+      </td>);
     // boardRows.push(<div key={i + 300} className="board-row">{boardColumns}</div>);
     boardRows.push(<tr key={`td-${i}`} className="board-row">{boardColumns}</tr>);
   }
